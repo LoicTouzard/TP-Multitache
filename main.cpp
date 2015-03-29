@@ -58,7 +58,7 @@ static void masquerSignaux(int noSignal)
 }
 int main(void)
 {
-	// I 0_1: Masquer les signaux SIGUSR2, SIGINT et SIGCHLD
+	//I_1.	Masquer les signaux (SIUGUSR2, SIGCHLD)
 	
 	/*struct sigaction action;
 	action.sa_handler = masquerSignaux;
@@ -73,80 +73,76 @@ int main(void)
 	pid_t pidC=-1;
 	pid_t pidG=-1;
 	
-	// I 1_1: Création de la boite aux lettres
+	//I_2.	Créer Boite aux lettres ArrivéeVéhicules
 	key_t cleBAL=ftok(REFERENCE, 1);
 	int idBAL=msgget(cleBAL, IPC_CREAT|DROITS);
 	
 	//Il manque un parametre taille pour les mémoires partagées
 	
-	// I 1_2: Création de la mémoire partagée nbVoitures
+	//I_3.	Créer Mémoire partagée NombreVéhicules
 	
 	/*key_t cleNbVoitures=ftok(REFERENCE, 1);
 	int idShNbVoitures=shmget(cleNbVoitures, IPC_CREAT|DROITS);*/
 	
-	// I 1_3: Création de la mémoire partagée positionVoitures
+	//I_4.	Créer Mémoire partagée positionVoiture
 	
 	/*key_t clePositionVoitures=ftok(REFERENCE, 1);
 	int idShPositionVoitures=shmget(clePositionVoitures, IPC_CREAT|DROITS);*/
 	
-	// I 1_4: Création de la mémoire partagée GestionTempo
+	//I_5.	Créer un tableau de 2 sémaphores (élémentaires ou globaux ?)
+	//I_6.	Attacher chaque sémaphore aux Mémoires partagées
+	//I_7.	Attacher la tâche courante(Mère) aux IPCs
 	
-	/*key_t cleGestionTempo=ftok(REFERENCE, 1);
-	int idShGestionTempo=shmget(cleGestionTempo, IPC_CREAT|DROITS);*/
-	
-	//Faire un tableau de sémaphore
-	
-	// I 1_5: Création sémaphore associé à la mémoire partagée nbVoitures
-	// I 1_6: Création sémaphore associé à la mémoire partagée positionVoiture
-	// I 1_7: Création sémaphore associé à la mémoire partagée GestionTempo
-	
-	// I 2_1: Création du Générateur
+	//I_8.	Créer la tâche Générateur
 	pidG=CreerEtActiverGenerateur(0, idBAL);
 	
 	if( (pidC=fork() )==0)
-	{ // I 2_2: Création de la tache Menu
+	{ //I_9.	Créer la tâche Menu
 		GMenu();
 	}
 	else {
-		// I 2_3: Création de la tache Heure
+		//I_10.	Créer la tâche Heure
 		pidH=CreerEtActiverHeure();
 		
-		// I 2_4: Création de la tache Voie (x4)
-		
-		// I 2_5: Création de la tache Feu
+		//I_11.	Créer une instance de tâche Voie avec le paramètre
+		//I_12.	Créer une instance de tâche Voie avec le paramètre
+		//I_13.	Créer une instance de tâche Voie avec le paramètre
+		//I_14.	Créer une instance de tâche Voie avec le paramètre
 
-		// M 1: Attendre reception du signal SIGCHLD depuis la tache Menu
+		//I_15.	Créer la tâche Feu
+
+		// M_1.	Attendre la réception du signal SIGCHLD de la part de Menu
 		while( waitpid(pidC, NULL, 0)==-1 && errno==EINTR);
 
-		// D 1_1: Envoyer signal de fin SIGUSR2 à la tache Heure
+		//D_1.	Envoyer signal SIGUSR2 à la tâche Heure
 		kill(pidH, SIGUSR2);
 		
-		// D 1_2: On attend le retour du signal de fin de la tache Heure
+		//D_2.	Attendre la fin de la tache Heure
 		while( waitpid(pidH, NULL, 0)==-1 && errno==EINTR);
 
-		// D 1_3: Envoyer signal SIGCONT à la tache Générateur
+		//D_3.	Envoyer signal SIGCONT à la tâche Générateur
 		kill(pidG, SIGCONT);
 		
-		// D 1_4: Envoyer signal de fin SIGUSR2 à la tache Générateur
+		//D_4.	Envoyer signal SIGUSR2 à la tâche Générateur
 		kill(pidG, SIGUSR2);
 		
-		// D 1_5: On attend le retour du signal de fin de la tache Générateur
+		//D_5.	Attendre la fin de la tache Générateur
 		while( waitpid(pidG, NULL, 0)==-1 && errno==EINTR);
 		
-		// D 2_1: Détruire le tableau de sémpahores
+		//D_6.	Envoyer signal SIGUSR2 à la tâche Feu
+		//D_7.	Attendre la fin de la tache Feu
+		
+		//D_8.	Détruire le tableau de sémaphores
 				
-		// D 2_2: Destruction de la mémoire partagée GestionTempo
+		//D_9.	Détacher les IPCs de la tâche courante(Mère)
 				
-		// D 2_3: Destruction de la mémoire partagée positionVoitures
-		
-		// D 2_4: Destruction de la mémoire partagée nbVoitures
-		
-		// D 2_5: Destruction de la boite aux lettres
-		
+		//D_10.	Détruire les IPCs
 		msgctl(idBAL, IPC_RMID, 0);
+		
+		
 		TerminerApplication(true);
 		
-		// D 3: Autodestruction
+		////D_11.	Autodestruction
 		exit(0);
 	}
 	return 0;
