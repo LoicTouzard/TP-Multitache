@@ -1,17 +1,17 @@
 /*************************************************************************
-                           Constante  -  description
+                           GMenu  -  description
                              -------------------
     début                : XXX
     copyright            : (C) XXX par XXX
     e-mail               : XXX
 *************************************************************************/
 
-//---------- Interface de la tâche <Constante> (fichier Constante.h) -------
-#if ! defined ( CONSTANTE_H )
-#define CONSTANTE_H
+//---------- Interface de la tâche <Feu> (fichier Feu.h) -------
+#if ! defined ( FEU_H )
+#define FEU_H
 
 //------------------------------------------------------------------------
-// Rôle de la tâche <Constante>
+// Rôle de la tâche <GMenu>
 //
 //
 //------------------------------------------------------------------------
@@ -25,18 +25,15 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-// type Nom ( liste de paramètres );
-// Mode d'emploi :
-//
-// Contrat :
-//
-enum couleurFeu {ROUGE, ORANGE, VERT};
+void Decomptetempo(int temps, int &tempoNS, int &tempoEO);
+void Feu(int idSem, int shmId);
 
-struct memoirePartagee{
-	int tempoEO;
-	int tempoNS;
-	couleurFeu couleurAxeNS;
-	couleurFeu couleurAxeEO;
-};
+//---------------------------------------------------- Fonctions privées
+static void actionFinTache(int noSignal);
 
-#endif // CONSTANTE_H
+
+#endif // FEU_H
+
+
+
+

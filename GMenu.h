@@ -32,10 +32,11 @@
 // Contrat :
 //
 
-void GMenu();
+void GMenu(int idSem,int idBAL,int idShm,pid_t pidGenerateur);
 void Commande(char code);
 void Commande(TypeVoie entree, TypeVoie sortie);
 void Commande(TypeVoie voie, unsigned int duree);
+
 
 #endif // GMENU_H
 

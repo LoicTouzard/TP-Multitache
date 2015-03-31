@@ -1,5 +1,5 @@
 EXE=Carrefour
-INT=GMenu.h
+INT=GMenu.h Feu.h
 
 SRC=$(INT:.h=.cpp)
 OBJ=$(INT:.h=.o)
