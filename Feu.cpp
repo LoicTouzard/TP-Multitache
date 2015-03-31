@@ -28,8 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
-#define AXE_NS 1
-#define AXE_EO 0
+//------------------------------------------------------------- Constantes
 #define TEMPO_ORANGE 3
 #define TEMPO_ROUGE 2
 //------------------------------------------------------------------ Types
@@ -86,15 +85,6 @@ void Feu(int idSem, int shmId)
 
 	//I_4.	S’attacher à la mémoire partagée GestionTempo
 	shmat(shmId, NULL, SHM_RDONLY);
-
-	int axe=AXE_NS;
-	int tempoNS;
-	int tempoEO;
-	
-	//Prendre un jeton
-	//Lire les valeurs de temporisation des feux dans la mémoire partagée
-	//int tempoAxe=shm->TEMPO_NS;
-	//Déposer le jeton
 	
 	//Semaphore 0 : Pour la gestion des temporisations
 	struct sembuf reserverTempo={SEMAPHORE_TEMPO,-1,0};
@@ -107,17 +97,38 @@ void Feu(int idSem, int shmId)
 	//I_5.	Attacher la tache à la mémoire partagée
 	memoirePartagee* shm=(memoirePartagee*) shmat (shmId, NULL, 0);
 	
+	
+	//Prendre un jeton
+	semop(idSem, &reserverTempo, 1);
+	//Lire les valeurs de temporisation des feux dans la mémoire partagée (potentielles MAJ)
+	int dureeNS=shm->tempoNS;
+	int dureeEO=shm->tempoEO;
+	//Déposer le jeton
+	semop(idSem, &deposerTempo, 1);
+	int tempoNS=dureeNS;
+	int tempoEO=tempoNS+TEMPO_ORANGE+TEMPO_ROUGE;
+	
 	while(true){
 		//Prendre un jeton
 		semop(idSem, &reserverTempo, 1);
 		//Lire les valeurs de temporisation des feux dans la mémoire partagée (potentielles MAJ)
-		int dureeNS=shm->tempoNS;
-		int dureeEO=shm->tempoEO;
+		dureeNS=shm->tempoNS;
+		dureeEO=shm->tempoEO;
 		//Déposer le jeton
 		semop(idSem, &deposerTempo, 1);
-	
+		
+		
+		
+		
+		//OK
 		tempoNS=dureeNS;
-		tempoEO=tempoNS+TEMPO_ORANGE+TEMPO_ROUGE;
+		tempoEO=dureeEO;
+		
+		
+		
+		
+		
+		
 		
 		//Afficher les temps pour chaque feu dans la zone Fonctionnement
 		Afficher(DUREE_AXE_NS, dureeNS);
@@ -148,8 +159,16 @@ void Feu(int idSem, int shmId)
 		//Mettre à jour les couleurs
 		Afficher(COULEUR_AXE_NS, "Orange");
 		
-		dureeNS=TEMPO_ORANGE;
-		tempoNS=dureeNS;
+		
+		
+		
+		//OK
+		tempoNS=TEMPO_ORANGE;
+		
+		
+		
+		
+		
 		
 		//Patienter pendant TEMPO_ORANGE secondes
 		Decomptetempo(TEMPO_ORANGE,tempoNS, tempoEO);
@@ -160,15 +179,32 @@ void Feu(int idSem, int shmId)
 		shm->couleurAxeNS=ROUGE;
 		//Déposer le jeton
 		semop(idSem, &deposerCouleur, 1);
-
-		Afficher(COULEUR_AXE_NS, "Rouge");
 		
-		dureeNS=TEMPO_ROUGE+dureeEO;
-		tempoNS=dureeNS;
+		Afficher(COULEUR_AXE_NS, "Rouge");
+
+
+
+
+
+
+		tempoNS=TEMPO_ROUGE+TEMPO_ORANGE+dureeEO;
+		
+		
+		
+		
+		
 		
 		//Patienter pendant TEMPO_ROUGE secondes
 		Decomptetempo(TEMPO_ROUGE,tempoNS, tempoEO);
-		
+
+		//Prendre un jeton
+		semop(idSem, &reserverTempo, 1);
+		//Lire les valeurs de temporisation des feux dans la mémoire partagée (potentielles MAJ)
+		dureeNS=shm->tempoNS;
+		dureeEO=shm->tempoEO;
+		//Déposer le jeton
+		semop(idSem, &deposerTempo, 1);
+
 		//Prendre un jeton
 		semop(idSem, &reserverCouleur, 1);
 		//Ecrire dans la mémoire partagée
@@ -179,10 +215,6 @@ void Feu(int idSem, int shmId)
 		//Mettre à jour les couleurs
 		Afficher(COULEUR_AXE_EO, "Vert");
 
-		tempoEO=dureeEO;
-		tempoNS=tempoEO+TEMPO_ORANGE+TEMPO_ROUGE;
-		
-
 		//Patienter pendant dureeEO secondes
 		Decomptetempo(dureeEO,tempoNS, tempoEO);
 		
@@ -192,10 +224,16 @@ void Feu(int idSem, int shmId)
 		shm->couleurAxeEO=ORANGE;
 		//Déposer le jeton
 		semop(idSem, &deposerCouleur, 1);
+
+
+
+
+		tempoEO=TEMPO_ORANGE;
 		
 		
-		dureeEO=TEMPO_ORANGE;
-		tempoEO=dureeEO;
+		
+		
+		
 		Afficher(COULEUR_AXE_EO, "Orange");
 
 	
@@ -208,17 +246,20 @@ void Feu(int idSem, int shmId)
 		shm->couleurAxeEO=ROUGE;
 		//Déposer le jeton
 		semop(idSem, &deposerCouleur, 1);
+
+
+
+
+
+		tempoEO=TEMPO_ROUGE+TEMPO_ORANGE+dureeNS;
 		
 		
-		dureeEO=TEMPO_ROUGE+dureeNS;
-		tempoEO=dureeEO;
+		
+		
 		
 		Afficher(COULEUR_AXE_EO, "Rouge");
-
 		//Patienter pendant TEMPO_ROUGE secondes
 		Decomptetempo(TEMPO_ROUGE,tempoNS, tempoEO);
-		
-		//axe=1-axe;
 	}
 }
 

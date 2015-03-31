@@ -15,11 +15,12 @@
 #include <sys/types.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <sys/msg.h>
 //------------------------------------------------------ Include personnel
+#include "Constantes.h"
 #include "GMenu.h"
 #include "Outils.h"
-#include "Constantes.h"
-
+#include "Voiture.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
@@ -36,6 +37,7 @@ static int G_idBAL;
 static int G_idShm;
 
 static memoirePartagee* G_shm;
+static unsigned int G_numeroManuel;
 
 //------------------------------------------------------ Fonctions privées
 //static type nom ( liste de paramètres )
@@ -51,7 +53,7 @@ static memoirePartagee* G_shm;
 //destruction du processus
 static void destructionMenu()
 {
-	//détachement de la mémoire partagée
+	//détachement de la mémoire partagée (superflue juste avant la fin du processus mais 'plus propre')
 	shmdt(G_shm);
 	exit(0);
 }
@@ -67,13 +69,17 @@ static void initialisationMenu(int idSem,int idBAL,int idShm,pid_t pidGen)
 	
 	//récupération de la mémoire partagée
 	G_shm=(memoirePartagee*)shmat(G_idShm, NULL, 0);
+	
+	//affectation du premier numero mioneralogique manuel
+	G_numeroManuel = numeroMinManuel;
 }
 
 static void P_ecritureDuree()
 {
 	struct sembuf reserverEcritureDuree = { SEMAPHORE_TEMPO, -1, 0 };
 	//on reserve pour l'ecriture d'une durée dans la mémoire partagée
-	semop(G_idSem, &reserverEcritureDuree, 1);
+	//potentiellement bloquant en attendant la libération des jetons
+	while(semop(G_idSem, &reserverEcritureDuree, 1)==-1 && errno== EINTR);
 }
 
 static void V_ecritureDuree()
@@ -130,7 +136,30 @@ void Commande(char code)
 
 void Commande(TypeVoie entree, TypeVoie sortie)
 {
-	
+	if(entree != AUCUNE && sortie != AUCUNE)
+	{
+		//création de la voiture et du message
+		struct Voiture v = { entree, sortie, G_numeroManuel };
+		struct MsgVoiture msgV = { entree, v };
+		
+		//potentiel operation bloquante en cas de saturation de la file
+		while(msgsnd(G_idBAL, &msgV, TAILLE_MSG_VOITURE,0)==-1 && errno== EINTR);
+		
+		//incrémentation visuelle du nombre de voiture dans la file correspondante
+		OperationVoie(PLUS, entree);
+		
+		Effacer(NUMERO);
+		Afficher(NUMERO, v.numero, GRAS);
+		
+		Effacer(ENTREE);
+		Afficher(ENTREE, v.entree, GRAS);
+		
+		Effacer(SORTIE);
+		Afficher(SORTIE, v.sortie, GRAS);
+		
+		//incrémentation du numéro minéralogique pour la prochaine voiture manuelle
+		(G_numeroManuel%=numeroMaxManuel)++;
+	}
 }
 
 
@@ -153,8 +182,3 @@ void Commande(TypeVoie voie, unsigned int duree)
 		V_ecritureDuree();
 	}
 }
-
-
-
-
-
