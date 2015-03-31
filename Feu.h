@@ -25,7 +25,7 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void Decomptetempo(int temps, int &tempoNS, int &tempoEO);
+void Decomptetempo(unsigned int temps, unsigned int &tempoNS, unsigned int &tempoEO);
 void Feu(int idSem, int shmId);
 
 //---------------------------------------------------- Fonctions privées
