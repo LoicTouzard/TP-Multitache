@@ -48,24 +48,48 @@
 //
 //{
 //} //----- fin de Nom
-static void masquerSignaux(int noSignal)
-{
-	//QUE FAIRE ?
+
+static void actionFinTache(int noSignal){
+	if(noSignal==SIGUSR2){
+		exit(0);
+	}
 }
+
 int main(void)
 {
-	//I_1.	Masquer les signaux
+	//I_1.	Démasquer les signaux
+	struct sigaction actionDefaut;
+	sigemptyset(&actionDefaut.sa_mask);
+	actionDefaut.sa_handler = SIG_DFL;
+	actionDefaut.sa_flags = 0;
+	sigaction(SIGCHLD, &actionDefaut, NULL);
+	sigaction(SIGUSR2, &actionDefaut, NULL);
+	sigaction(SIGINT, &actionDefaut, NULL);
 	
 	//I_2.	Créer handler finTache
+	struct sigaction finTache;
+	sigemptyset(&actionIgnore.sa_mask);
+	finTache.sa_handler = actionFinTache();
+	finTache.sa_flags = 0;
 
 	//I_3.	Armer SIGUSR2 sur finTache
-	
+	sigaction(SIGUSR2, &finTache, NULL);
+
 	//I_4.	S’attacher à la mémoire partagée GestionTempo
+	shmat(shmId, const void *zone, SHM_RDONLY);
 	
 	//M_1.	Afficher les temps sur l’écran (section Fonctionnement)
 	
-	//M_2.	Ecrire dans la mémoire partagée GestionTempo (MAJ Enum)
 	
+	//M_2.	Ecrire dans la mémoire partagée GestionTempo (MAJ Enum)
+
+	int i=0;
+	while(i<shm.tempoNS){
+		sleep(1);
+		i++;
+	}
+
+
 	// M_3.	Dormir TEMPO_VERT1 secondes
 		//a.	Afficher le temps restant à l’écran
 	// M_4.	Ecrire dans la mémoire partagée GestionTempo (MAJ Enum)
@@ -86,6 +110,8 @@ int main(void)
 
 		
 	// D_1.	Se détacher de la mémoire partagée GestionTempo
+	shmdt(const void *zone);
+	
 	// D_2.	Autodestruction
 	exit(0);
 }

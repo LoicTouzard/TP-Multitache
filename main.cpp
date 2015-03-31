@@ -18,18 +18,21 @@
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/sem.h>
 #include <sys/shm.h>
 #include <errno.h>
 //------------------------------------------------------ Include personnel
 #include "Outils.h"
 #include "GMenu.h"
 #include "Heure.h"
+#include "Constante.h"
 #include "Generateur.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
 #define DROITS 0660
 #define REFERENCE "./Carrefour"
+#define NBSEM 2 //Nombre de sémaphores
 //------------------------------------------------------------------ Types
 
 //---------------------------------------------------- Variables statiques
@@ -52,97 +55,114 @@
 //
 //{
 //} //----- fin de Nom
-static void masquerSignaux(int noSignal)
-{
-	//QUE FAIRE ?
-}
+
 int main(void)
 {
-	//I_1.	Masquer les signaux (SIUGUSR2, SIGCHLD)
+	//I_1.	Masquer les signaux (SIGINT, SIGUSR2 et SIGCHLD)
+	struct sigaction actionIgnore;
+	sigemptyset(&actionIgnore.sa_mask);
+	actionIgnore.sa_handler = SIG_IGN;
+	actionIgnore.sa_flags = 0;
+	sigaction(SIGCHLD, &actionIgnore, NULL);
+	sigaction(SIGUSR2, &actionIgnore, NULL);
+	sigaction(SIGINT, &actionIgnore, NULL);
 	
-	/*struct sigaction action;
-	action.sa_handler = masquerSignaux;
-	sigemptyset(&action.sa_mask);
-	action.sa_flags=0;
-	sigaction(SIGCHLD, &action, NULL);
-	sigaction(SIGUSR2, &action, NULL);
-	sigaction(SIGINT, &action, NULL);*/
-
 	InitialiserApplication(XTERM);
-	pid_t pidH=-1;
-	pid_t pidC=-1;
-	pid_t pidG=-1;
+	pid_t pidHeure=-1;
+	pid_t pidMenu=-1;
+	pid_t pidGenerateur=-1;
+	/*pid_t pidVoie_N=-1;
+	pid_t pidVoie_S=-1;
+	pid_t pidVoie_E=-1;
+	pid_t pidVoie_O-1;
+	pid_t pidFeu=-1;*/
 	
 	//I_2.	Créer Boite aux lettres ArrivéeVéhicules
-	key_t cleBAL=ftok(REFERENCE, 1);
-	int idBAL=msgget(cleBAL, IPC_CREAT|DROITS);
+	key_t cle=ftok(REFERENCE, 1);
+	int idBAL=msgget(cle, IPC_CREAT|DROITS);
 	
-	//Il manque un parametre taille pour les mémoires partagées
+	//I_3.	Créer un tableau de 2 sémaphores
+	int idSem=semget( cle, NBSEM, IPC_CREAT|DROITS);
 	
-	//I_3.	Créer Mémoire partagée NombreVéhicules
+	//Initialisation des sémaphores
+	semctl(idSem, 0, SETVAL, 1); //Semaphore 0: Semaphore associé à la mémoire partagée GestionTempo
+	semctl(idSem, 1, SETVAL, 4); //Semaphore 1: Semaphore associé à la mémoire partagée CouleurFeu (potentiellement 4 lecteurs)
 	
-	/*key_t cleNbVoitures=ftok(REFERENCE, 1);
-	int idShNbVoitures=shmget(cleNbVoitures, IPC_CREAT|DROITS);*/
+	//I_4.	Créer une mémoire partagée
+	int idShm=shmget(cle, sizeof(memoirePartagee), IPC_CREAT|DROITS);
 	
-	//I_4.	Créer Mémoire partagée positionVoiture
+	//I_5.	Attacher la tache à la mémoire partagée
+	memoirePartagee* shm=(memoirePartagee*) shmat (idShm, NULL, 0);
+	shm->tempoEO=10;
+	shm->tempoNS=20;
+	shm->couleurAxeNS=ROUGE;
+	shm->couleurAxeEO=ROUGE;
 	
-	/*key_t clePositionVoitures=ftok(REFERENCE, 1);
-	int idShPositionVoitures=shmget(clePositionVoitures, IPC_CREAT|DROITS);*/
+	//I_6.	Détacher la mère de la mémoire partagée
+	shmdt(shm);
 	
-	//I_5.	Créer un tableau de 2 sémaphores (élémentaires ou globaux ?)
-	//I_6.	Attacher chaque sémaphore aux Mémoires partagées
-	//I_7.	Attacher la tâche courante(Mère) aux IPCs
+	//I_6.	Réactivation des signaux
+	struct sigaction actionDefaut;
+	sigemptyset(&actionDefaut.sa_mask);
+	actionDefaut.sa_handler = SIG_DFL;
+	actionDefaut.sa_flags = 0;
+	sigaction(SIGCHLD, &actionDefaut, NULL);
+	sigaction(SIGUSR2, &actionDefaut, NULL);
+	sigaction(SIGINT, &actionDefaut, NULL);
+
+	//I_7.	Créer la tâche Générateur
+	pidGenerateur=CreerEtActiverGenerateur(0, idBAL);
 	
-	//I_8.	Créer la tâche Générateur
-	pidG=CreerEtActiverGenerateur(0, idBAL);
-	
-	if( (pidC=fork() )==0)
-	{ //I_9.	Créer la tâche Menu
+	if( (pidMenu=fork() )==0)
+	{ //I_8.	Créer la tâche Menu
 		GMenu();
 	}
 	else {
-		//I_10.	Créer la tâche Heure
-		pidH=CreerEtActiverHeure();
+		//I_9.	Créer la tâche Heure
+		pidHeure=CreerEtActiverHeure();
 		
-		//I_11.	Créer une instance de tâche Voie avec le paramètre
-		//I_12.	Créer une instance de tâche Voie avec le paramètre
-		//I_13.	Créer une instance de tâche Voie avec le paramètre
-		//I_14.	Créer une instance de tâche Voie avec le paramètre
+		//I_10.	Créer une instance de tâche Voie avec le paramètre N
+		//I_11.	Créer une instance de tâche Voie avec le paramètre S
+		//I_12.	Créer une instance de tâche Voie avec le paramètre E
+		//I_13.	Créer une instance de tâche Voie avec le paramètre O
 
-		//I_15.	Créer la tâche Feu
+		//I_14.	Créer la tâche Feu
 
 		// M_1.	Attendre la réception du signal SIGCHLD de la part de Menu
-		while( waitpid(pidC, NULL, 0)==-1 && errno==EINTR);
+		while( waitpid(pidMenu, NULL, 0)==-1 && errno==EINTR);
 
 		//D_1.	Envoyer signal SIGUSR2 à la tâche Heure
-		kill(pidH, SIGUSR2);
+		kill(pidHeure, SIGUSR2);
 		
 		//D_2.	Attendre la fin de la tache Heure
-		while( waitpid(pidH, NULL, 0)==-1 && errno==EINTR);
+		while( waitpid(pidHeure, NULL, 0)==-1 && errno==EINTR);
 
 		//D_3.	Envoyer signal SIGCONT à la tâche Générateur
-		kill(pidG, SIGCONT);
+		kill(pidGenerateur, SIGCONT);
 		
 		//D_4.	Envoyer signal SIGUSR2 à la tâche Générateur
-		kill(pidG, SIGUSR2);
+		kill(pidGenerateur, SIGUSR2);
 		
 		//D_5.	Attendre la fin de la tache Générateur
-		while( waitpid(pidG, NULL, 0)==-1 && errno==EINTR);
+		while( waitpid(pidGenerateur, NULL, 0)==-1 && errno==EINTR);
 		
 		//D_6.	Envoyer signal SIGUSR2 à la tâche Feu
+		//kill(pidFeu, SIGUSR2);
+
 		//D_7.	Attendre la fin de la tache Feu
+		//while( waitpid(pidFeu, NULL, 0)==-1 && errno==EINTR);
+
+		//D_8.	Détruire la mémoire partagée
+		shmctl(idShm, IPC_RMID, 0);
+
+		//D_9.	Détruire le tableau de sémaphores
+		semctl(idSem, 0, IPC_RMID, 0);
 		
-		//D_8.	Détruire le tableau de sémaphores
-				
-		//D_9.	Détacher les IPCs de la tâche courante(Mère)
-				
-		//D_10.	Détruire les IPCs
+		//D_10.	Détruire la BAL
 		msgctl(idBAL, IPC_RMID, 0);
-		
-		
+
+		//D_11.	Autodestruction
 		TerminerApplication(true);
-		
-		////D_11.	Autodestruction
 		exit(0);
 	}
 	return 0;
