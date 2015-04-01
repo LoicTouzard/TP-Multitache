@@ -53,7 +53,6 @@ int main(void)
 	sigaction(SIGCHLD, &actionIgnore, NULL);
 	sigaction(SIGUSR2, &actionIgnore, NULL);
 	
-	InitialiserApplication(XTERM);
 	pid_t pidHeure=-1;
 	pid_t pidMenu=-1;
 	pid_t pidGenerateur=-1;
@@ -95,6 +94,9 @@ int main(void)
 	sigaction(SIGCHLD, &actionDefaut, NULL);
 	sigaction(SIGUSR2, &actionDefaut, NULL);
 
+	InitialiserApplication(XTERM);
+
+	
 	//I_7.	Créer la tâche Générateur
 	pidGenerateur=CreerEtActiverGenerateur(0, idBAL);
 	
