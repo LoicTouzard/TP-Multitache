@@ -1,23 +1,23 @@
 /*************************************************************************
-                           GMenu  -  description
+                           Voie  -  description
                              -------------------
     début                : XXX
     copyright            : (C) XXX par XXX
     e-mail               : XXX
 *************************************************************************/
 
-//---------- Interface de la tâche <Feu> (fichier Feu.h) -------
-#if ! defined ( FEU_H )
-#define FEU_H
-
+//---------- Interface de la tâche <Voie> (fichier Voie.h) -------
+#if ! defined ( VOIE_H )
+#define VOIE_H
 //------------------------------------------------------------------------
-// Rôle de la tâche <GMenu>
+// Rôle de la tâche <Voie>
 //
 //
 //------------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////  INCLUDE
 //--------------------------------------------------- Interfaces utilisées
+#include "Outils.h"
 
 //------------------------------------------------------------- Constantes
 
@@ -25,14 +25,12 @@
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 //---------------------------------------------------- Fonctions publiques
-void Decomptetempo(unsigned int temps, unsigned int &tempoNS, unsigned int &tempoEO);
-void Feu(int idSem, int shmId);
-void EcritureShmAxeNS(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu);
-void EcritureShmAxeEO(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu);
-void MAJTempoShm(int idSem, memoirePartagee* shm, unsigned int &dureeNS,unsigned int &dureeEO);
+// type Nom ( liste de paramètres );
+// Mode d'emploi :
+//
+// Contrat :
+//
 
-#endif // FEU_H
-
-
-
+void Voie(TypeVoie voie, int idSem,int idBAL,int idShm);
+#endif // VOIE_H
 

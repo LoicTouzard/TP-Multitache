@@ -28,6 +28,7 @@
 #include "Heure.h"
 #include "Feu.h"
 #include "Generateur.h"
+#include "Voie.h"
 
 ///////////////////////////////////////////////////////////////////  PRIVE
 //------------------------------------------------------------- Constantes
@@ -51,16 +52,15 @@ int main(void)
 	actionIgnore.sa_flags = 0;
 	sigaction(SIGCHLD, &actionIgnore, NULL);
 	sigaction(SIGUSR2, &actionIgnore, NULL);
-	sigaction(SIGINT, &actionIgnore, NULL);
 	
 	InitialiserApplication(XTERM);
 	pid_t pidHeure=-1;
 	pid_t pidMenu=-1;
 	pid_t pidGenerateur=-1;
-	/*pid_t pidVoie_N=-1;
+	pid_t pidVoie_N=-1;
 	pid_t pidVoie_S=-1;
 	pid_t pidVoie_E=-1;
-	pid_t pidVoie_O-1;*/
+	pid_t pidVoie_O=-1;
 	pid_t pidFeu=-1;
 	
 	//I_2.	Créer Boite aux lettres ArrivéeVéhicules
@@ -94,7 +94,6 @@ int main(void)
 	actionDefaut.sa_flags = 0;
 	sigaction(SIGCHLD, &actionDefaut, NULL);
 	sigaction(SIGUSR2, &actionDefaut, NULL);
-	sigaction(SIGINT, &actionDefaut, NULL);
 
 	//I_7.	Créer la tâche Générateur
 	pidGenerateur=CreerEtActiverGenerateur(0, idBAL);
@@ -108,52 +107,103 @@ int main(void)
 		pidHeure=CreerEtActiverHeure();
 		
 		//I_10.	Créer une instance de tâche Voie avec le paramètre N
-		//I_11.	Créer une instance de tâche Voie avec le paramètre S
-		//I_12.	Créer une instance de tâche Voie avec le paramètre E
-		//I_13.	Créer une instance de tâche Voie avec le paramètre O
-
-		//I_14.	Créer la tâche Feu
-		if( (pidFeu=fork() )==0)
+		if((pidVoie_N=fork()) == 0)
 		{
-			Feu(idSem, idShm);
+			Voie(NORD, idSem, idBAL, idShm);
 		}
-		else {
-			// M_1.	Attendre la réception du signal SIGCHLD de la part de Menu
-			while( waitpid(pidMenu, NULL, 0)==-1 && errno==EINTR);
+		else
+		{
+			//I_11.	Créer une instance de tâche Voie avec le paramètre S
+			if((pidVoie_S=fork()) == 0)
+			{
+				Voie(SUD, idSem, idBAL, idShm);
+			}
+			else
+			{
+				//I_12.	Créer une instance de tâche Voie avec le paramètre E
+				if((pidVoie_E=fork()) == 0)
+				{
+					Voie(EST, idSem, idBAL, idShm);
+				}
+				else
+				{
+					//I_13.	Créer une instance de tâche Voie avec le paramètre O
+					if((pidVoie_O=fork()) == 0)
+					{
+						Voie(OUEST, idSem, idBAL, idShm);
+					}
+					else
+					{
+						//I_14.	Créer la tâche Feu
+						if( (pidFeu=fork() )==0)
+						{
+							Feu(idSem, idShm);
+						}
+						else {
+							// M_1.	Attendre la réception du signal SIGCHLD de la part de Menu
+							while( waitpid(pidMenu, NULL, 0)==-1 && errno==EINTR);
 
-			//D_1.	Envoyer signal SIGUSR2 à la tâche Heure
-			kill(pidHeure, SIGUSR2);
-			
-			//D_2.	Attendre la fin de la tache Heure
-			while( waitpid(pidHeure, NULL, 0)==-1 && errno==EINTR);
+							//D_1.	Envoyer signal SIGUSR2 à la tâche Heure
+							kill(pidHeure, SIGUSR2);
+							
+							//D_2.	Attendre la fin de la tache Heure
+							while( waitpid(pidHeure, NULL, 0)==-1 && errno==EINTR);
 
-			//D_3.	Envoyer signal SIGCONT à la tâche Générateur
-			kill(pidGenerateur, SIGCONT);
-			
-			//D_4.	Envoyer signal SIGUSR2 à la tâche Générateur
-			kill(pidGenerateur, SIGUSR2);
-			
-			//D_5.	Attendre la fin de la tache Générateur
-			while( waitpid(pidGenerateur, NULL, 0)==-1 && errno==EINTR);
-			
-			//D_6.	Envoyer signal SIGUSR2 à la tâche Feu
-			kill(pidFeu, SIGUSR2);
+							//D_3.	Envoyer signal SIGCONT à la tâche Générateur
+							kill(pidGenerateur, SIGCONT);
+							
+							//D_4.	Envoyer signal SIGUSR2 à la tâche Générateur
+							kill(pidGenerateur, SIGUSR2);
+							
+							//D_5.	Attendre la fin de la tache Générateur
+							while( waitpid(pidGenerateur, NULL, 0)==-1 && errno==EINTR);
+							
+							//D_6.	Envoyer signal SIGUSR2 à XXXX
+							kill(pidVoie_N, SIGUSR2);
+							
+							//D_7.	Attendre la fin de la tache XXXXXX
+							while( waitpid(pidVoie_N, NULL, 0)==-1 && errno==EINTR);
+							
+							//D_8.	Envoyer signal SIGUSR2 à XXXX
+							kill(pidVoie_S, SIGUSR2);
+							
+							//D_9.	Attendre la fin de la tache XXXXXX
+							while( waitpid(pidVoie_S, NULL, 0)==-1 && errno==EINTR);
+							
+							//D_10.	Envoyer signal SIGUSR2 à XXXX
+							kill(pidVoie_E, SIGUSR2);
+							
+							//D_11.	Attendre la fin de la tache XXXXXX
+							while( waitpid(pidVoie_E, NULL, 0)==-1 && errno==EINTR);
+							
+							//D_12.	Envoyer signal SIGUSR2 à XXXX
+							kill(pidVoie_O, SIGUSR2);
+							
+							//D_13.	Attendre la fin de la tache XXXXXX
+							while( waitpid(pidVoie_O, NULL, 0)==-1 && errno==EINTR);
+							
+							//D_14.	Envoyer signal SIGUSR2 à la tâche Feu
+							kill(pidFeu, SIGUSR2);
 
-			//D_7.	Attendre la fin de la tache Feu
-			while( waitpid(pidFeu, NULL, 0)==-1 && errno==EINTR);
+							//D_15.	Attendre la fin de la tache Feu
+							while( waitpid(pidFeu, NULL, 0)==-1 && errno==EINTR);
 
-			//D_8.	Détruire la mémoire partagée
-			shmctl(idShm, IPC_RMID, 0);
+							//D_16.	Détruire la mémoire partagée
+							shmctl(idShm, IPC_RMID, 0);
 
-			//D_9.	Détruire le tableau de sémaphores
-			semctl(idSem, 0, IPC_RMID, 0);
-			
-			//D_10.	Détruire la BAL
-			msgctl(idBAL, IPC_RMID, 0);
+							//D_17.	Détruire le tableau de sémaphores
+							semctl(idSem, 0, IPC_RMID, 0);
+							
+							//D_18.	Détruire la BAL
+							msgctl(idBAL, IPC_RMID, 0);
 
-			//D_11.	Autodestruction
-			TerminerApplication(true);
-			exit(0);
+							//D_19.	Autodestruction
+							TerminerApplication(true);
+							exit(0);
+						}
+					}
+				}
+			}
 		}
 	}
 	return 0;
