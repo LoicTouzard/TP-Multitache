@@ -1,5 +1,5 @@
 /*************************************************************************
-                           Constante  -  description
+                           Constantes  -  description
                              -------------------
     début                : XXX
     copyright            : (C) XXX par XXX
@@ -7,8 +7,8 @@
 *************************************************************************/
 
 //---------- Constantes utilisables par toutes les tâches (fichier Constante.h) -------
-#if ! defined ( CONSTANTE_H )
-#define CONSTANTE_H
+#if ! defined ( CONSTANTES_H )
+#define CONSTANTES_H
 
 
 #define SEMAPHORE_TEMPO 0
@@ -23,4 +23,4 @@ struct MemoirePartagee{
 	CouleurFeu couleurAxeEO;
 };
 
-#endif // CONSTANTE_H
+#endif // CONSTANTES_H

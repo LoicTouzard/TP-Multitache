@@ -32,7 +32,7 @@ void Voie(TypeVoie voie, int idSem,int idBAL,int idShm);
 //		Necessite également l'id des semaphores sur la mémoire partagée
 //		L'id de la mémoire partagée afin de lire l'état des feux
 //		L'id de la boite aux lettre dans laquelle il pourra récupérer les voiture en attente sur sa voie
-//
 //		La tâche Voie se termine correctement à la réception du signal SIGUSR2
+
 #endif // VOIE_H
 

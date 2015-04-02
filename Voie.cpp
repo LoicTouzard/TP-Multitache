@@ -82,7 +82,7 @@ static void destructionVoie()
 //		Détache la mémoire partagée
 //		Quitte le programme
 {
-	//On masque le signal SIGCHILD pour ne pas être géné par le handler lors de la destruction manuelle des fils
+	//On masque le signal SIGCHILD pour ne pas être géné par le handlerSIGCHLD lors de la destruction manuelle des fils
 	struct sigaction actionSIGCHLD;
 	sigemptyset(&actionSIGCHLD.sa_mask);
 	actionSIGCHLD.sa_handler = SIG_IGN;
