@@ -172,6 +172,7 @@ static CouleurFeu lireFeu(TypeVoie voie)
 //		Effectue une lecture des couleurs protégée par un sémaphore dans la mémoire partagée
 {
 	CouleurFeu feu = ROUGE;
+	//Redondance du P / V dans le if mais minimisation des operations dans la reservation
 	if(voie == NORD || voie == SUD)
 	{
 		P_lectureCouleur();
@@ -197,7 +198,7 @@ static void moteurVoie(const TypeVoie voie)
 //		Dessine et lance cette voiture lorsque le feu est vert
 {
 	//boucle infinie sur la phase moteur
-	for(;;)
+	for( ; ; )
 	{
 		struct MsgVoiture msgV; 
 		//Lire dans la bal un message qui correspond a la voie
