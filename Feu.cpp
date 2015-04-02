@@ -70,7 +70,7 @@ void Decomptetempo(unsigned int temps, unsigned int &tempoNS,unsigned int &tempo
 	}
 }
 
-void EcritureShmAxeNS(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu){
+void EcritureShmAxeNS(int idSem, MemoirePartagee* shm, CouleurFeu couleurDuFeu){
 	//Prendre un jeton
 	semop(idSem, &reserverCouleur, 1);
 	//Ecrire dans la mémoire partagée (MAJ des couleurs)
@@ -79,7 +79,7 @@ void EcritureShmAxeNS(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu){
 	semop(idSem, &deposerCouleur, 1);
 }
 
-void EcritureShmAxeEO(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu){
+void EcritureShmAxeEO(int idSem, MemoirePartagee* shm, CouleurFeu couleurDuFeu){
 	//Prendre un jeton
 	semop(idSem, &reserverCouleur, 1);
 	//Ecrire dans la mémoire partagée (MAJ des couleurs)
@@ -88,7 +88,7 @@ void EcritureShmAxeEO(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu){
 	semop(idSem, &deposerCouleur, 1);
 }
 
-void MAJTempoShm(int idSem, memoirePartagee* shm, unsigned int &dureeNS,unsigned int &dureeEO){
+void MAJTempoShm(int idSem, MemoirePartagee* shm, unsigned int &dureeNS,unsigned int &dureeEO){
 	//Prendre un jeton
 	semop(idSem, &reserverTempo, 1);
 	//Lire les valeurs de temporisation des feux dans la mémoire partagée (potentielles MAJ)
@@ -118,7 +118,7 @@ void Feu(int idSem, int shmId)
 	sigaction(SIGUSR2, &finTache, NULL);
 
 	//I_4.	Attacher la tache à la mémoire partagée
-	memoirePartagee* shm=(memoirePartagee*) shmat (shmId, NULL, 0);
+	MemoirePartagee* shm=(MemoirePartagee*) shmat (shmId, NULL, 0);
 
 	unsigned int dureeNS;
 	unsigned int dureeEO;

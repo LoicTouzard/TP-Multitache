@@ -27,9 +27,9 @@
 //---------------------------------------------------- Fonctions publiques
 void Decomptetempo(unsigned int temps, unsigned int &tempoNS, unsigned int &tempoEO);
 void Feu(int idSem, int shmId);
-void EcritureShmAxeNS(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu);
-void EcritureShmAxeEO(int idSem, memoirePartagee* shm, couleurFeu couleurDuFeu);
-void MAJTempoShm(int idSem, memoirePartagee* shm, unsigned int &dureeNS,unsigned int &dureeEO);
+void EcritureShmAxeNS(int idSem, MemoirePartagee* shm, CouleurFeu couleurDuFeu);
+void EcritureShmAxeEO(int idSem, MemoirePartagee* shm, CouleurFeu couleurDuFeu);
+void MAJTempoShm(int idSem, MemoirePartagee* shm, unsigned int &dureeNS,unsigned int &dureeEO);
 
 #endif // FEU_H
 

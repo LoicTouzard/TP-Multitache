@@ -75,10 +75,10 @@ int main(void)
 	semctl(idSem, SEMAPHORE_COULEUR, SETVAL, 4); //Semaphore 1: Semaphore associé à la mémoire partagée CouleurFeu (potentiellement 4 lecteurs)
 	
 	//I_5.	Créer une mémoire partagée
-	int idShm=shmget(cle, sizeof(memoirePartagee), IPC_CREAT|DROITS);
+	int idShm=shmget(cle, sizeof(MemoirePartagee), IPC_CREAT|DROITS);
 	
 	//I_6.	Attacher la tache à la mémoire partagée
-	memoirePartagee* shm=(memoirePartagee*) shmat (idShm, NULL, 0);
+	MemoirePartagee* shm=(MemoirePartagee*) shmat (idShm, NULL, 0);
 	shm->tempoEO=10;
 	shm->tempoNS=20;
 	shm->couleurAxeNS=ROUGE;

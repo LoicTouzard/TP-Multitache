@@ -14,15 +14,13 @@
 #define SEMAPHORE_TEMPO 0
 #define SEMAPHORE_COULEUR 1
 
-enum couleurFeu {ROUGE, ORANGE, VERT};
+enum CouleurFeu {ROUGE, ORANGE, VERT};
 
-
-
-struct memoirePartagee{
+struct MemoirePartagee{
 	unsigned int tempoEO;
 	unsigned int tempoNS;
-	couleurFeu couleurAxeNS;
-	couleurFeu couleurAxeEO;
+	CouleurFeu couleurAxeNS;
+	CouleurFeu couleurAxeEO;
 };
 
 #endif // CONSTANTE_H

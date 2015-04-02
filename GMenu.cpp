@@ -36,7 +36,7 @@ static int G_idSem;
 static int G_idBAL;
 static int G_idShm;
 
-static memoirePartagee* G_shm;
+static MemoirePartagee* G_shm;
 static unsigned int G_numeroManuel;
 
 //------------------------------------------------------ Fonctions privées
@@ -68,7 +68,7 @@ static void initialisationMenu(int idSem,int idBAL,int idShm,pid_t pidGen)
 	G_idShm = idShm;
 	
 	//récupération de la mémoire partagée
-	G_shm=(memoirePartagee*)shmat(G_idShm, NULL, 0);
+	G_shm=(MemoirePartagee*)shmat(G_idShm, NULL, 0);
 	
 	//affectation du premier numero mioneralogique manuel
 	G_numeroManuel = numeroMinManuel;
@@ -97,10 +97,9 @@ static void V_ecritureDuree()
 //{
 //} //----- fin de Nom
 
-void GMenu(int idSem,int idBAL,int idShm,pid_t pidGen)
+void GMenu(int idSem,int idBAL,int idShm, pid_t pidGen)
 {
 	initialisationMenu(idSem, idBAL, idShm, pidGen);
-
 	
 	//bloquant
 	Menu();
