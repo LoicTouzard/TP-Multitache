@@ -60,4 +60,5 @@ $(BACKUP):
 	$(CP) *.cpp $(BACKUPPATH)
 	$(CP) *.h $(BACKUPPATH)
 	$(CP) Makefile $(BACKUPPATH)
+	chmod 664 *
 	make EXE=BackUpCarrefour

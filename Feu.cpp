@@ -117,21 +117,19 @@ void Feu(int idSem, int shmId)
 	//I_3.	Armer SIGUSR2 sur finTache
 	sigaction(SIGUSR2, &finTache, NULL);
 
-	//I_4.	S’attacher à la mémoire partagée GestionTempo
-	shmat(shmId, NULL, SHM_RDONLY);
-
-	//I_5.	Attacher la tache à la mémoire partagée
+	//I_4.	Attacher la tache à la mémoire partagée
 	memoirePartagee* shm=(memoirePartagee*) shmat (shmId, NULL, 0);
 
 	unsigned int dureeNS;
 	unsigned int dureeEO;
 	
-	//On récupère les durees de chaque Axe dans la mémoire partagée
+	//I_5.On récupère les durees de chaque Axe dans la mémoire partagée
 	MAJTempoShm(idSem, shm, dureeNS, dureeEO);
 
 	unsigned int tempoNS=dureeNS;
 	unsigned int tempoEO=dureeNS+TEMPO_ORANGE+TEMPO_ROUGE;
 	
+	//I_6.	Mettre à blanc les zones où l'on s'apprete à Ecrire
 	Effacer(TEMPS_AXE_NS);
 	Effacer(TEMPS_AXE_EO);
 	
