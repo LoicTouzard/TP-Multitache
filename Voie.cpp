@@ -100,9 +100,6 @@ static void destructionVoie()
 	//Détachement de la mémoire partagée
 	//Superflue juste avant la fin du processus car le detachement serait automatique, mais 'plus propre')
 	shmdt(G_shm);
-	
-	//Terminaison de la tâche
-	exit(0);
 }	//----- fin de de destructionVoie
 
 
@@ -129,6 +126,8 @@ static void handlerSIGUSR2(int numSignal)
 	 *	Phase DESTRUCTION	*
 	 ************************/
 	destructionVoie();
+	//Terminaison de la tâche
+	exit(0);
 }	//----- fin de de handlerSIGUSR2
 
 
