@@ -160,28 +160,28 @@ int main(void)
 							//D_5.	Attendre la fin de la tache Générateur
 							while( waitpid(pidGenerateur, NULL, 0)==-1 && errno==EINTR);
 							
-							//D_6.	Envoyer signal SIGUSR2 à XXXX
+							//D_6.	Envoyer signal SIGUSR2 à VoieN
 							kill(pidVoie_N, SIGUSR2);
 							
-							//D_7.	Attendre la fin de la tache XXXXXX
+							//D_7.	Attendre la fin de la tache VoieN
 							while( waitpid(pidVoie_N, NULL, 0)==-1 && errno==EINTR);
 							
-							//D_8.	Envoyer signal SIGUSR2 à XXXX
+							//D_8.	Envoyer signal SIGUSR2 à VoieS
 							kill(pidVoie_S, SIGUSR2);
 							
-							//D_9.	Attendre la fin de la tache XXXXXX
+							//D_9.	Attendre la fin de la tache VoieS
 							while( waitpid(pidVoie_S, NULL, 0)==-1 && errno==EINTR);
 							
-							//D_10.	Envoyer signal SIGUSR2 à XXXX
+							//D_10.	Envoyer signal SIGUSR2 à VoieE
 							kill(pidVoie_E, SIGUSR2);
 							
-							//D_11.	Attendre la fin de la tache XXXXXX
+							//D_11.	Attendre la fin de la tache VoieE
 							while( waitpid(pidVoie_E, NULL, 0)==-1 && errno==EINTR);
 							
-							//D_12.	Envoyer signal SIGUSR2 à XXXX
+							//D_12.	Envoyer signal SIGUSR2 à VoieO
 							kill(pidVoie_O, SIGUSR2);
 							
-							//D_13.	Attendre la fin de la tache XXXXXX
+							//D_13.	Attendre la fin de la tache VoieO
 							while( waitpid(pidVoie_O, NULL, 0)==-1 && errno==EINTR);
 							
 							//D_14.	Envoyer signal SIGUSR2 à la tâche Feu
