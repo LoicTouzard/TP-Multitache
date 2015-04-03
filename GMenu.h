@@ -11,7 +11,7 @@
 
 //------------------------------------------------------------------------
 // Rôle de la tâche <GMenu>
-//		GMenu récupère et traite les informations donnée par clavier 
+//		GMenu récupère et traite les informations données par clavier 
 //		à travers des methodes Commande
 //
 //------------------------------------------------------------------------
@@ -24,12 +24,6 @@
 //------------------------------------------------------------------ Types
 
 //////////////////////////////////////////////////////////////////  PUBLIC
-//---------------------------------------------------- Fonctions publiques
-// type Nom ( liste de paramètres );
-// Mode d'emploi :
-//
-// Contrat :
-//
 
 void GMenu(int idSem,int idBAL,int idShm,pid_t pidGenerateur);
 // Mode d'emploi :

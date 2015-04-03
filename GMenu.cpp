@@ -14,6 +14,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <sys/msg.h>
+#include <errno.h>
 //------------------------------------------------------ Include personnel
 #include "Constantes.h"
 #include "GMenu.h"

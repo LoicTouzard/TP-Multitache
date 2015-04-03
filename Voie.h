@@ -10,7 +10,7 @@
 #define VOIE_H
 //------------------------------------------------------------------------
 // Rôle de la tâche <Voie>
-//	Voie récupère les voitures générées et lance leur déplacements sur l'IHM
+//	Voie récupère les voitures générées et lance leur déplacement sur l'IHM
 //
 //------------------------------------------------------------------------
 

@@ -17,8 +17,8 @@
 enum CouleurFeu {ROUGE, ORANGE, VERT};
 
 struct MemoirePartagee{
-	unsigned int tempoEO;
 	unsigned int tempoNS;
+	unsigned int tempoEO;
 	CouleurFeu couleurAxeNS;
 	CouleurFeu couleurAxeEO;
 };
