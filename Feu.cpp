@@ -12,7 +12,6 @@
 //-------------------------------------------------------- Include système
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>

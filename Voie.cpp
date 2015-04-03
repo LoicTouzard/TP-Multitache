@@ -34,7 +34,7 @@
 
 //---------------------------------------------------- Variables statiques
 
-//ID des IPCS
+//ID des IPCs
 static int G_idSem;
 static int G_idBAL;
 static int G_idShm;
@@ -50,7 +50,7 @@ static std::set<pid_t> G_voitures;
 static void P_lectureCouleur()
 // Mode d'emploi :
 //		Permet de réserver l'accès pour la lecture dans la mémoire partagée
-//		La zone réservée concerne exclusivement la couleur des Feu
+//		La zone réservée concerne exclusivement la couleur des Feux
 // Algorithme :
 //		Effectue un semop de reservation pour une valeur de 1
 {
@@ -64,7 +64,7 @@ static void P_lectureCouleur()
 static void V_lectureCouleur()
 // Mode d'emploi :
 //		Permet de libérer un jeton d'accès en lecture de la mémoire partagée
-//		La zone libérée concerne exclusivement la couleur des Feu
+//		La zone libérée concerne exclusivement la couleur des Feux
 // Algorithme :
 //		Effectue un semop de libération pour une valeur de 1
 {
@@ -171,7 +171,7 @@ static CouleurFeu lireFeu(TypeVoie voie)
 //		Effectue une lecture des couleurs protégée par un sémaphore dans la mémoire partagée
 {
 	CouleurFeu feu = ROUGE;
-	//Redondance du P / V dans le if mais minimisation des operations dans la reservation
+	//Redondance du P / V dans les if mais minimisation des operations dans la reservation
 	if(voie == NORD || voie == SUD)
 	{
 		P_lectureCouleur();
@@ -237,11 +237,14 @@ void Voie(TypeVoie voie, int idSem,int idBAL,int idShm)
 	/****************************
 	 *	Phase INITIALISATION	*
 	 ****************************/
+
 	initialisationVoie(idSem, idBAL, idShm);
 	
+
 	/********************
 	 *	Phase MOTEUR 	*
 	 ********************/
+	
 	moteurVoie(voie);	//bloquant
 }	//----- fin de de Voie
 
